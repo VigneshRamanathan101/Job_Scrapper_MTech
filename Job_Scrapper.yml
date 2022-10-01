@@ -1,0 +1,4 @@
+name: Job_scrapper
+channels:
+  - defaults
+prefix: D:\Users\vigne\anaconda3\envs\Job_scrapper
