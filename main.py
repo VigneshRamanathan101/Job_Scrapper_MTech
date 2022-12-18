@@ -1,9 +1,11 @@
 from asyncio import exceptions
+import queue
 from ssl import Options
 import time
 import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 import requests
 from bs4 import BeautifulSoup
 
@@ -12,15 +14,16 @@ job_role = "Data Science" #input("Enter Job role: ")
 location = "" #input("location [Null]: ")
 
 url = f"https://www.linkedin.com/jobs/search?keywords={job_role}&location={location}&geoId=&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0"
+print(url)
 
 # Web scrapper for infinite scrolling page
 options = Options()
-options.add_argument('--headless')
+#options.add_argument('--headless')
 options.binary_location = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 driver = webdriver.Chrome(chrome_options = options, executable_path=r'chromedriver.exe')     
 driver.get(url)
-time.sleep(2)  # Allow 2 seconds for the web page to open
-scroll_pause_time = 1 # You can set your own pause time. My laptop is a bit slow so I use 1 sec
+time.sleep(1)  # Allow 2 seconds for the web page to open
+scroll_pause_time = 3 # You can set your own pause time. My laptop is a bit slow so I use 1 sec
 screen_height = driver.execute_script("return window.screen.height;")   # get the screen height of the web
 i = 1
 
@@ -34,6 +37,28 @@ while True:
     # Break the loop when the height we need to scroll to is larger than the total scroll height
     if (screen_height) * i > scroll_height:
         break 
+    print("Scrolling by Infinite Page")
+
+queue = [0,0,0,0,0]
+while True:
+    #if 'see more jobs' found
+    try:
+        See_more_jobs = driver.find_element(By.XPATH, "/html/body/div[1]/div/main/section[2]/button")
+    except:
+        break
+    if See_more_jobs:
+        See_more_jobs.click()
+        time.sleep(scroll_pause_time)
+    else:
+        break
+    post = driver.find_elements(By.CSS_SELECTOR,'a.base-card__full-link.absolute.top-0.right-0.bottom-0.left-0.p-0.z-\[2\]')
+    queue.append(len(post))
+    queue.pop(0)
+    if sum(queue)//len(queue) == queue[0]:
+        break
+    print(len(post))
+    if len(post)>1000:
+        break
 
 '''   
 try:
@@ -60,11 +85,3 @@ jobs = soup.find_all(class_ = "base-card__full-link absolute top-0 right-0 botto
 print(jobs[0].text)
 
 print(len(jobs))
-print(url)
-'''
-#show-more-less-html__markup
-
-#https://medium.com/analytics-vidhya/using-python-and-selenium-to-scrape-infinite-scroll-web-pages-825d12c24ec7
-
-#infinite-scroll
-'''
