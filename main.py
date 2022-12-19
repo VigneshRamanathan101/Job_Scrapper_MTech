@@ -4,10 +4,13 @@ from ssl import Options
 import time
 import logging
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.edge.service import Service as EdgeService
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 #input
 job_role = "Data Science" #input("Enter Job role: ")
@@ -18,9 +21,7 @@ print(url)
 
 # Web scrapper for infinite scrolling page
 options = Options()
-#options.add_argument('--headless')
-options.binary_location = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
-driver = webdriver.Chrome(chrome_options = options, executable_path=r'chromedriver.exe')     
+driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
 driver.get(url)
 time.sleep(1)  # Allow 2 seconds for the web page to open
 scroll_pause_time = 3 # You can set your own pause time. My laptop is a bit slow so I use 1 sec
@@ -57,31 +58,47 @@ while True:
     if sum(queue)//len(queue) == queue[0]:
         break
     print(len(post))
-    if len(post)>1000:
-        break
 
-'''   
-try:
-    request = requests.get(url)
-except:
-    print("couldn't reach the requested webpage :|")
-
-# print response
-print(request, "\n\n\n")
-  
-# print url
-print(request.url, "\n\n\n")
-'''
 
 try:
     soup = BeautifulSoup(driver.page_source,"lxml")
-
-    #print(soup)
 except Exception as e:
     print("!!! \t\t Error Occured \t\t !!!\n\n\n")
     print(e)
-
+    
+driver.quit() # close the selenium sessions
 jobs = soup.find_all(class_ = "base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]")
-print(jobs[0].text)
+cols = ['Job title', 'Job link', 'city', 'Seniority level','Employment type', 'Job function', 'Industries']
+df = pd.DataFrame(columns= cols )
+df_list = []
 
-print(len(jobs))
+def detailed_job_post(job_post_link):
+    data = {'Seniority level' : 'NA', 'Employment type' : 'NA', 'Job function' : 'NA', 'Industries' : 'NA'}
+    try:
+        sub_link = requests.get(job_post_link)
+    except:
+        return data
+    sub_link_data = BeautifulSoup(sub_link.text,"lxml")
+    list = sub_link_data.find_all( class_ = "description__job-criteria-subheader")                                           # 3
+    list_value = sub_link_data.find_all( class_ = "description__job-criteria-text description__job-criteria-text--criteria") # 4
+    for i in range(len(list)) :
+        data[list[i].text.strip()] = list_value[i].text.strip()
+    return data
+
+
+for job_post in jobs:
+    link = job_post.get('href')                      # 1
+    title = job_post.text.strip()                    # 2
+    value = detailed_job_post(link)
+    company = ((job_post.find_next_sibling('div',"base-search-card__info")).find(class_ = "base-search-card__subtitle")).text.strip()
+    #company_link = 
+    city = (job_post.find_next_sibling('div',"base-search-card__info")).find(class_ = "job-search-card__location").text.strip()
+    value['city'] = city
+    value['Job link'] = link
+    value['Job title'] = title
+    print(f'{len(df_list)+1}/{len(jobs)}',value)
+    df_list.append([ title, link, city, value['Seniority level'], value['Employment type'], value['Job function'], value['Industries']])
+
+new_df = pd.DataFrame(df_list, columns= cols) 
+output = pd.concat([df, new_df],axis = 0).to_csv('output.csv')
+
