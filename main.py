@@ -1,8 +1,12 @@
 # EDA using web Scrapper by Akil Ajith,Ajay Thomas and Vignesh Ramanathan
 # Import Files
-import input_user as i
-import scrapper as s
-
+import modules
+import glob
+from modules import input_user as i
+from modules import scrapper as s
+import output
+from modules import eda as op
+from output import *
 
 print("Welcome to AAV's Job Scrapper EDA program")
 print("""Choose your Job Title
@@ -17,5 +21,6 @@ print("""Choose your Job Location
       3.Mumbai""")
 loc=i.get_loc()
 
+#Scraping Linkedin for Jobs
 print("Web Scrapping Now")
-s.scrap_job(job,loc)
+csvf=s.scrap_job(job,loc)
