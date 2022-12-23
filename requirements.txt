@@ -15,7 +15,7 @@ numpy==1.23.2
 outcome==1.2.0
 packaging==22.0
 pandas==1.4.4
-pip==22.3.1
+pip>=22.3.1
 pycparser==2.21
 pyOpenSSL==22.0.0
 PySocks==1.7.1
@@ -38,3 +38,7 @@ webdriver-manager==3.8.5
 wheel==0.37.1
 win-inet-pton==1.1.0
 wsproto==1.2.0
+dash
+dash-html-components
+dash-core-components
+plotly

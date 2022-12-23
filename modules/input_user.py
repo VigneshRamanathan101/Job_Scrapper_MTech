@@ -24,3 +24,9 @@ def get_loc():
         print("Wrong choice")
         get_loc()
 
+def ponc():
+    nc=int(input("Enter Your Choice: "))
+    if nc ==2:
+        return 2
+    else:
+        return 1
