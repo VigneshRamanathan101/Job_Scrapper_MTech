@@ -1,5 +1,6 @@
 # Import dependancies
 import os
+import time
 import pandas as pd
 
 # get the current working directory
@@ -26,8 +27,9 @@ def edat(job,loc):
     #Clean location
     jobdata['City'] = jobdata['City'].apply(lambda x: loc)
 
-    print("Data Cleaning Done")
-    print("Displaying Data now")
+    print("Processing Data Now")
+    time.sleep(2)
     jobdata.to_csv('output/test.csv')
     print("Data Cleaning done")
+    time.sleep(2)
     

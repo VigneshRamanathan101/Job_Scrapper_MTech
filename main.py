@@ -1,6 +1,7 @@
 # EDA using web Scrapper by Akil Ajith,Ajay Thomas and Vignesh Ramanathan
 # Import Files
 import os
+import time
 import pandas as pd
 import webbrowser
 from modules import input_user as i
@@ -23,12 +24,15 @@ loc=i.get_loc()
 
 #Scraping Linkedin for Jobs
 print("Web Scrapping Now")
+# Delay the print statement for 20 seconds
+time.sleep(2)
 csvf=s.scrap_job(job,loc)
 print(" Web Scraping Done and Output Saved")
       
 
 #Performing Data Cleaning 
 peda=op.edat(job,loc)
+time.sleep(2)
 
 os.system('py modules/dispdata.py')
 
