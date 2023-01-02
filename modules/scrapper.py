@@ -77,7 +77,7 @@ def scrap_job(job_role,location):
 
     driver.quit() # close the selenium sessions
     jobs = soup.find_all(class_ = "base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]")
-    cols = ['Job title', 'Job link', 'city', 'Seniority level','Employment type', 'Job function', 'Industries']
+    cols = ['Job title', 'Job link', 'City', 'Seniority level','Employment type', 'Job function', 'Industries']
     df = pd.DataFrame(columns= cols )
     df_list = []
 
@@ -88,12 +88,12 @@ def scrap_job(job_role,location):
         value = detailed_job_post(link)
         company = ((job_post.find_next_sibling('div',"base-search-card__info")).find(class_ = "base-search-card__subtitle")).text.strip()
         #company_link = 
-        city = (job_post.find_next_sibling('div',"base-search-card__info")).find(class_ = "job-search-card__location").text.strip()
-        value['city'] = city
+        City = (job_post.find_next_sibling('div',"base-search-card__info")).find(class_ = "job-search-card__location").text.strip()
+        value['City'] = City
         value['Job link'] = link
         value['Job title'] = title
         print(f'{len(df_list)+1}/{len(jobs)}',value)
-        df_list.append([ title, link, city, value['Seniority level'], value['Employment type'], value['Job function'], value['Industries']])
+        df_list.append([ title, link, City, value['Seniority level'], value['Employment type'], value['Job function'], value['Industries']])
 
     new_df = pd.DataFrame(df_list, columns= cols) 
     output = pd.concat([df, new_df],axis = 0).to_csv('output/output.csv')
